@@ -1,0 +1,60 @@
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual C++ Express 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TinyRT", "TinyRT.vcproj", "{EB8272A4-42F1-4E17-A417-52117230F680}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TRTPick", "examples\TRTPick\TRTPick.vcproj", "{9C04CC2D-C188-4443-A185-CB0BCA6ED98D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TRTInstancing", "examples\TRTInstancing\TRTInstancing.vcproj", "{23CBDF2B-1EEC-4860-B72F-970C30CDD562}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4BA747F5-E528-4B05-9595-38FFF4AAFBEF} = {4BA747F5-E528-4B05-9595-38FFF4AAFBEF}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TRTSampleUtils", "examples\TRTSampleUtils\TRTSampleUtils.vcproj", "{EEC2226C-A804-445B-9243-47B85E4BBBEA}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TRTRenderTest", "examples\TRTRenderTest\TRTRenderTest.vcproj", "{4BA747F5-E528-4B05-9595-38FFF4AAFBEF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{EEC2226C-A804-445B-9243-47B85E4BBBEA} = {EEC2226C-A804-445B-9243-47B85E4BBBEA}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Profile|Win32 = Profile|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EB8272A4-42F1-4E17-A417-52117230F680}.Debug|Win32.ActiveCfg = Debug|Win32
+		{EB8272A4-42F1-4E17-A417-52117230F680}.Debug|Win32.Build.0 = Debug|Win32
+		{EB8272A4-42F1-4E17-A417-52117230F680}.Profile|Win32.ActiveCfg = Release|Win32
+		{EB8272A4-42F1-4E17-A417-52117230F680}.Profile|Win32.Build.0 = Release|Win32
+		{EB8272A4-42F1-4E17-A417-52117230F680}.Release|Win32.ActiveCfg = Release|Win32
+		{EB8272A4-42F1-4E17-A417-52117230F680}.Release|Win32.Build.0 = Release|Win32
+		{9C04CC2D-C188-4443-A185-CB0BCA6ED98D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9C04CC2D-C188-4443-A185-CB0BCA6ED98D}.Debug|Win32.Build.0 = Debug|Win32
+		{9C04CC2D-C188-4443-A185-CB0BCA6ED98D}.Profile|Win32.ActiveCfg = Release|Win32
+		{9C04CC2D-C188-4443-A185-CB0BCA6ED98D}.Profile|Win32.Build.0 = Release|Win32
+		{9C04CC2D-C188-4443-A185-CB0BCA6ED98D}.Release|Win32.ActiveCfg = Release|Win32
+		{9C04CC2D-C188-4443-A185-CB0BCA6ED98D}.Release|Win32.Build.0 = Release|Win32
+		{23CBDF2B-1EEC-4860-B72F-970C30CDD562}.Debug|Win32.ActiveCfg = Debug|Win32
+		{23CBDF2B-1EEC-4860-B72F-970C30CDD562}.Debug|Win32.Build.0 = Debug|Win32
+		{23CBDF2B-1EEC-4860-B72F-970C30CDD562}.Profile|Win32.ActiveCfg = Release|Win32
+		{23CBDF2B-1EEC-4860-B72F-970C30CDD562}.Profile|Win32.Build.0 = Release|Win32
+		{23CBDF2B-1EEC-4860-B72F-970C30CDD562}.Release|Win32.ActiveCfg = Release|Win32
+		{23CBDF2B-1EEC-4860-B72F-970C30CDD562}.Release|Win32.Build.0 = Release|Win32
+		{EEC2226C-A804-445B-9243-47B85E4BBBEA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{EEC2226C-A804-445B-9243-47B85E4BBBEA}.Debug|Win32.Build.0 = Debug|Win32
+		{EEC2226C-A804-445B-9243-47B85E4BBBEA}.Profile|Win32.ActiveCfg = Release|Win32
+		{EEC2226C-A804-445B-9243-47B85E4BBBEA}.Profile|Win32.Build.0 = Release|Win32
+		{EEC2226C-A804-445B-9243-47B85E4BBBEA}.Release|Win32.ActiveCfg = Release|Win32
+		{EEC2226C-A804-445B-9243-47B85E4BBBEA}.Release|Win32.Build.0 = Release|Win32
+		{4BA747F5-E528-4B05-9595-38FFF4AAFBEF}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4BA747F5-E528-4B05-9595-38FFF4AAFBEF}.Debug|Win32.Build.0 = Debug|Win32
+		{4BA747F5-E528-4B05-9595-38FFF4AAFBEF}.Profile|Win32.ActiveCfg = Release|Win32
+		{4BA747F5-E528-4B05-9595-38FFF4AAFBEF}.Profile|Win32.Build.0 = Release|Win32
+		{4BA747F5-E528-4B05-9595-38FFF4AAFBEF}.Release|Win32.ActiveCfg = Release|Win32
+		{4BA747F5-E528-4B05-9595-38FFF4AAFBEF}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
