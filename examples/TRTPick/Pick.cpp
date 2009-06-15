@@ -866,7 +866,7 @@ void InitTRTPicking( ID3DXMesh* pMesh )
 
     // build the BVH
     TinyRT::SahAABBTreeBuilder< TinyRT::StridedMesh<WORD> > builder( 0.7f );
-    g_BVH.BuildTree( &mesh, builder );
+    g_BVH.Build( &mesh, builder );
 
     // unlock the buffers
     pMesh->UnlockVertexBuffer( );

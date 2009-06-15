@@ -70,6 +70,11 @@ namespace TinyRT
 
     private:
 
+        struct Indices
+        {
+            Index_T indices[3];
+        };
+
         
         const uint8* m_pVertices;
         Index_T* m_pIndices;

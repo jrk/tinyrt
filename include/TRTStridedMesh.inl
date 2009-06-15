@@ -81,11 +81,7 @@ namespace TinyRT
     template< class uint_t >
     inline void StridedMesh< uint_t >::RemapObjects( const obj_id* pObjectRemap )
     {
-        struct Indices
-        {
-            Index_T indices[3];
-        };
-        TinyRT::RemapArray( reinterpret_cast<Indices*>( m_pIndices ), m_nTriangles, pObjectRemap );
+        TinyRT::RemapArray( reinterpret_cast<Indices*>( m_pIndices ), m_nFaces, pObjectRemap );
     }
 
     //=====================================================================================================================

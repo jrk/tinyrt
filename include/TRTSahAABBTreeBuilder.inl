@@ -255,7 +255,7 @@ namespace TinyRT
         float fInvRootArea = 1.0f / fRootArea;
 
         // split information, initialized to the cost of creating a leaf
-        float fBestCost ;
+        float fBestCost =0;
         int nSplitAxis = -1;
         obj_id nSplitId = 0;
         AxisAlignedBox splitRightBox;

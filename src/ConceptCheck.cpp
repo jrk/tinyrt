@@ -95,7 +95,7 @@ static void ConceptCheckQuadAABBTree( QuadAABBTree<ObjectSet_C>* pTree, Ray_C& r
 // Verify that KD tree builders will work with any class implementing the KDTree_C interface
 static void ConceptCheckKDTreeBuilders( KDTree_C* pTree, ObjectSet_C* pObjects )
 {
-    SahKDTreeBuilder< ObjectSet_C, Clipper_C > sah;
+    SahKDTreeBuilder< ObjectSet_C, Clipper_C > sah( 3.0f );
     sah.BuildTree( pObjects, pTree );
 }
 

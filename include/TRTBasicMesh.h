@@ -77,6 +77,11 @@ namespace TinyRT
 
     private:
 
+        struct Indices
+        {
+            Index_T indices[3];
+        };
+
         Vec3_T*  m_pVertices;
         Index_T* m_pIndices;
         uint32 m_nTriangles;

@@ -31,21 +31,17 @@ namespace TinyRT
     template< typename BVH_T, typename ObjectSet_T, typename HitInfo_T, typename Ray_T >
     void RaycastBVH( const BVH_T* pBVH, const ObjectSet_T* pObjects, Ray_T& rRay, HitInfo_T& rHitInfo, typename BVH_T::ConstNodeHandle pRoot, ScratchMemory& rScratch )
     {
-        struct StackEntry
-        {
-            BVH_T::ConstNodeHandle pNode;
-        };
-
-        ScratchArray<StackEntry> stack( rScratch, pBVH->GetStackDepth() );
-        StackEntry* pStack = stack;
+        typedef typename BVH_T::ConstNodeHandle NodeHandle;
+        ScratchArray< NodeHandle > stack( rScratch, pBVH->GetStackDepth() );
+        NodeHandle* pStack = stack;
         
-        StackEntry* pStackBottom = pStack++;
-        pStackBottom->pNode = pRoot;
+        NodeHandle* pStackBottom = pStack++;
+        *pStackBottom = pRoot;
         
         while( pStack != pStackBottom )
         {
             pStack--;
-            BVH_T::ConstNodeHandle pNode = pStack->pNode;
+            BVH_T::ConstNodeHandle pNode = *pStack;
 
             while( pBVH->RayNodeTest( pNode, rRay ) )
             {
@@ -73,12 +69,12 @@ namespace TinyRT
                     uint32 nAxis = pBVH->GetNodeSplitAxis( pNode );
                     if( rRay.Direction()[nAxis] < 0 )
                     {
-                        pStack->pNode = pLeft;
+                        *pStack = pLeft;
                         pNode = pRight;
                     }
                     else
                     {
-                        pStack->pNode = pRight;
+                        *pStack = pRight;
                         pNode = pLeft;
                     }
                     pStack++;

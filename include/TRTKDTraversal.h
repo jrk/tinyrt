@@ -1,6 +1,6 @@
 //=====================================================================================================================
 //
-//   TRTKDTraversal..h
+//   TRTKDTraversal.h
 //
 //   Definition of class: TinyRT::KDTraversal
 //
@@ -17,6 +17,13 @@
 
 namespace TinyRT
 {
+    template< class KDTree_T >
+    struct KDStackEntry
+    {
+        typename KDTree_T::ConstNodeHandle pNode;
+        float fTMin;
+        float fTMax;
+    };
 
     //=====================================================================================================================
     /// \ingroup TinyRT
@@ -32,13 +39,7 @@ namespace TinyRT
     {
         Mailbox_T mailbox( pObjects );
 
-        struct StackEntry
-        {
-            KDTree_T::ConstNodeHandle pNode;
-            float fTMin;
-            float fTMax;
-        };
-
+        typedef KDStackEntry<KDTree_T> StackEntry;
 
         ScratchArray<StackEntry> pStackArray( rScratch, pTree->GetStackDepth() );
         StackEntry* pStack = pStackArray;

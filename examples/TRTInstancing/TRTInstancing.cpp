@@ -260,7 +260,7 @@ int main( )
 
     // create mesh instances
     MeshInstance* pInstances[INSTANCE_COUNT];
-    int nSize = sqrt( (float) INSTANCE_COUNT );
+    int nSize = (int) sqrt( (float) INSTANCE_COUNT );
 
     for( int i=0; i<INSTANCE_COUNT; i++ )
     {
@@ -275,8 +275,8 @@ int main( )
     InstancedMeshObjectSet objects( &pInstances[0], INSTANCE_COUNT );
 
     // position the camera
-    TinyRT::Vec3f vLookAt( nSize/2, 0, nSize/2 );
-    TinyRT::Vec3f vOrigin = vLookAt + Vec3f( 0, nSize/2, -nSize );
+    TinyRT::Vec3f vLookAt( nSize/2.0f, 0, nSize/2.0f );
+    TinyRT::Vec3f vOrigin = vLookAt + Vec3f( 0, nSize/2.0f, (float) -nSize );
    
     // draw
     PPMImage image(512,512);

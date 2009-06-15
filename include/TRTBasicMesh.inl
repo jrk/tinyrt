@@ -75,10 +75,6 @@ namespace TinyRT
     template< class Vec3_T, class uint_t >
     inline void BasicMesh< Vec3_T,uint_t >::RemapObjects( obj_id* pObjectRemap )
     {
-        struct Indices
-        {
-            Index_T indices[3];
-        };
         TinyRT::RemapArray( reinterpret_cast<Indices*>( m_pIndices ), m_nTriangles, pObjectRemap );
     }
 
