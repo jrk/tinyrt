@@ -29,6 +29,9 @@ namespace TinyRT
     template< typename MBVH_T, typename ObjectSet_T, typename HitInfo_T, typename Ray_T >
     void RaycastMultiBVH( const MBVH_T* pBVH, const ObjectSet_T* pObjects, Ray_T& rRay, HitInfo_T& rHitInfo, const typename MBVH_T::ConstNodeHandle pRoot, ScratchMemory& rScratch )
     {
+        typedef typename MBVH_T::ConstNodeHandle ConstNodeHandle;
+        typedef typename MBVH_T::obj_id obj_id;
+
         const Vec3f& rDir = rRay.Direction();
         int nDirSigns[4] = {
             rDir.x > 0 ? 0 : 1,
@@ -37,23 +40,22 @@ namespace TinyRT
         };
         nDirSigns[3] =  (nDirSigns[2] << 2) | (nDirSigns[1] << 1) | nDirSigns[0];
 
-
         size_t nStackSize = pBVH->GetStackDepth()*(MBVH_T::BRANCH_FACTOR);
-        ScratchArray<MBVH_T::ConstNodeHandle> pStackMem( rScratch, nStackSize );
-        MBVH_T::ConstNodeHandle* pStack = pStackMem;
-        const MBVH_T::ConstNodeHandle* pStackBottom = pStack;
+        ScratchArray<ConstNodeHandle> pStackMem( rScratch, nStackSize );
+        ConstNodeHandle* pStack = pStackMem;
+        const ConstNodeHandle* pStackBottom = pStack;
         (*pStack++) = pRoot;
 
 
         while( pStack != pStackBottom )
         {
             pStack--;
-            MBVH_T::ConstNodeHandle pNode = *pStack;
+            ConstNodeHandle pNode = *pStack;
 
             if( pBVH->IsNodeLeaf( pNode ) )
             {
-                MBVH_T::obj_id nFirstObject;
-                MBVH_T::obj_id nLastObject;
+                obj_id nFirstObject;
+                obj_id nLastObject;
                 pBVH->GetNodeObjectRange( pNode, nFirstObject, nLastObject );
                 
                 pObjects->RayIntersect( rRay, rHitInfo, nFirstObject, nLastObject );

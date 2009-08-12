@@ -173,7 +173,6 @@ namespace TinyRT
         /// \sa CullBox
         inline CullResult CullBox( const AxisAlignedBox& rBox ) const { return CullBox( rBox.Min(), rBox.Max() ); };
 
-    private:
 
         //  Each of the X,Y, and Z members contains two copies of the corresponding component of the plane normals.
         //   The X[0], Y[0] and Z[0] terms contain the plane normal values (if it is negative), or 0 otherwise.

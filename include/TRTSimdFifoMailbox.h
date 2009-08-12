@@ -67,6 +67,17 @@ namespace TinyRT
 
     private:
 
+#ifdef __GNUC__ 
+
+        inline __m128i ReadCache( __m128i& vTst )
+        {
+            __m128i v = _mm_cmpeq_epi32( m_cache_simd[0], vTst );
+            for( int i=1; i<SIZE/4; i++ )
+                v = _mm_or_si128( v, _mm_cmpeq_epi32( m_cache_simd[i], vTst ));
+            return v;
+        }
+
+#else
         template< int nSize >
         inline __m128i ReadCache( __m128i& vTst )
         {
@@ -78,7 +89,8 @@ namespace TinyRT
         {
             return _mm_cmpeq_epi32( m_cache_simd[0], vTst );
         }
-        
+#endif
+
         union
         {
             __m128i m_cache_simd[SIZE/4];

@@ -108,7 +108,7 @@ namespace TinyRT
         SimdVecf P0[3];
         SimdVecf P1[3];
         SimdVecf P2[3];
-        TRT_SIMDALIGN float pTHit[ SimdVecf::WIDTH ];
+        float TRT_SIMDALIGN pTHit[ SimdVecf::WIDTH ];
         TRT_SIMDALIGN float pUV[2][ SimdVecf::WIDTH ];
 
         const Vec3f& rOrigin = rRay.Origin();

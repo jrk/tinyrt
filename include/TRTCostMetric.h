@@ -51,7 +51,7 @@ namespace TinyRT
     {
         if( pTree->IsNodeLeaf( pNode ) )
         {
-            AABBTree_T::obj_id nFirst, nLast;
+            typename AABBTree_T::obj_id nFirst, nLast;
             pTree->GetNodeObjectRange( pNode, nFirst, nLast );
             
             float fCost = 0;
@@ -69,8 +69,9 @@ namespace TinyRT
             Vec3f vSize = box.Max() - box.Min();
             float fArea = vSize.x*( vSize.y + vSize.z ) + vSize.y*vSize.z;
 
-            const AABBTree_T::Node* pLeft = pTree->GetLeftChild( pNode );
-            const AABBTree_T::Node* pRight = pTree->GetRightChild( pNode );
+            typedef typename AABBTree_T::ConstNodeHandle NodeHandle;
+            NodeHandle pLeft = pTree->GetLeftChild( pNode );
+            NodeHandle pRight = pTree->GetRightChild( pNode );
             AxisAlignedBox leftBox  = pTree->GetNodeBoundingVolume( pLeft );
             AxisAlignedBox rightBox = pTree->GetNodeBoundingVolume( pRight );
             Vec3f vLeftSize = leftBox.Max() - leftBox.Min();
@@ -95,7 +96,7 @@ namespace TinyRT
     template< typename AABBTree_T >
     float GetAABBTreeSAHCost( float fFixedCost, const AABBTree_T* pTree, const typename AABBTree_T::ConstNodeHandle pNode )
     {
-        return GetAABBTreeSAHCost( ConstantCost<AABBTree_T::obj_id>(fFixedCost), pTree, pNode );
+        return GetAABBTreeSAHCost( ConstantCost<typename AABBTree_T::obj_id>(fFixedCost), pTree, pNode );
     }
 
 
@@ -114,8 +115,8 @@ namespace TinyRT
     {
         if( pTree->IsNodeLeaf( pNode ) )
         {
-            KDTree_T::LeafIterator itStart;
-            KDTree_T::LeafIterator itEnd;
+            typename KDTree_T::LeafIterator itStart;
+            typename KDTree_T::LeafIterator itEnd;
             pTree->GetNodeObjectList( pNode, itStart, itEnd );
 
             float fCost = 0;
@@ -169,7 +170,7 @@ namespace TinyRT
     template< typename KDTree_T >
     float GetKDTreeSAHCost( float fFixedCost, const KDTree_T* pTree, const typename KDTree_T::ConstNodeHandle pNode, const AxisAlignedBox& rRootBox )
     {
-        return GetKDTreeSAHCost( ConstantCost<KDTree_T::obj_id>( fFixedCost ), pTree, pNode, rRootBox );
+        return GetKDTreeSAHCost( ConstantCost<typename KDTree_T::obj_id>( fFixedCost ), pTree, pNode, rRootBox );
     }
 
     //=====================================================================================================================

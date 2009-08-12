@@ -34,7 +34,6 @@ namespace TinyRT
                 
         typedef ObjectSet_T ObjectSet;
         typedef typename ObjectSet_T::obj_id obj_id;
-        typedef typename ObjectSet_T::obj_id obj_id;
         typedef const obj_id* LeafIterator; ///< Type that acts as an iterator over objects in a leaf
 
         /// A node in a KD-tree

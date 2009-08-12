@@ -60,19 +60,19 @@ namespace TinyRT
         const Vec3f& rRayOrigin = rRay.Origin();
         const Vec3f& rRayDirectionInv = rRay.InvDirection();
 
-        KDTree_T::ConstNodeHandle pNode = pTree->GetRoot();
+        typename KDTree_T::ConstNodeHandle pNode = pTree->GetRoot();
         while( 1 )
         {
             if( pTree->IsNodeLeaf( pNode ) )
             {
                 // intersect all objects in this leaf node, then proceed with next node from stack
-                KDTree_T::LeafIterator itBegin, itEnd;
+                typename KDTree_T::LeafIterator itBegin, itEnd;
                 pTree->GetNodeObjectList( pNode, itBegin, itEnd );
                 const typename KDTree_T::ObjectSet& rObjects = *pObjects;
 
                 while( itBegin != itEnd )
                 {
-                    KDTree_T::obj_id nObject = *itBegin;
+                    typename KDTree_T::obj_id nObject = *itBegin;
                     if( !mailbox.CheckMailbox( nObject ) )
                         rObjects.RayIntersect( rRay, rHitInfo, nObject ); 
                     
@@ -88,8 +88,8 @@ namespace TinyRT
                 float fD     = rRayDirectionInv[axis];
                 float fTHit  = ( fSplit - fO ) * fD;
 
-                KDTree_T::ConstNodeHandle pNear = pTree->GetLeftChild( pNode );
-                KDTree_T::ConstNodeHandle pFar  = pTree->GetRightChild( pNode );
+                typename KDTree_T::ConstNodeHandle pNear = pTree->GetLeftChild( pNode );
+                typename KDTree_T::ConstNodeHandle pFar  = pTree->GetRightChild( pNode );
                 if( fD < 0 )
                     std::swap( pNear, pFar );
 

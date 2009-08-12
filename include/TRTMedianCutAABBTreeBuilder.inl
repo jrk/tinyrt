@@ -72,7 +72,7 @@ namespace TinyRT
         }
         
         // initialize the tree
-        AABBTree_T::NodeHandle pRoot = pTree->Initialize( globalBox, 2*nObjects - 1 );
+        typename AABBTree_T::NodeHandle pRoot = pTree->Initialize( globalBox, 2*nObjects - 1 );
 
         // build the tree
         uint32 nMaxDepth = MedianCut( &objectPtrs[0], nObjects, pTree, pRoot, &globalBox, &objectRemap[0], 0, 0 );
@@ -132,11 +132,12 @@ namespace TinyRT
                 nAxis = 2;
 
             // sort the objects along this axis
+            ObjectSorter<0> sortx; ObjectSorter<1> sorty; ObjectSorter<2> sortz;
             switch( nAxis )
             {
-            case 0: std::sort( pObjects, pObjects + nObjects, ObjectSorter<0>() ); break;
-            case 1: std::sort( pObjects, pObjects + nObjects, ObjectSorter<1>() ); break;
-            case 2: std::sort( pObjects, pObjects + nObjects, ObjectSorter<2>() ); break;
+            case 0: std::sort( pObjects, pObjects + nObjects, sortx ); break;
+            case 1: std::sort( pObjects, pObjects + nObjects, sorty ); break;
+            case 2: std::sort( pObjects, pObjects + nObjects, sortz ); break;
             };
 
             // split the object list in half

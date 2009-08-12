@@ -15,9 +15,15 @@
 #ifndef _TRT_MATH_H_
 #define _TRT_MATH_H_
 
+#include <math.h>
 
 namespace TinyRT
 {
+
+#ifdef __GNUC__
+    inline float sqrtf( float f ) { return sqrt(f); };
+#endif
+
     /// \ingroup TinyRT
     template< class uint_t > inline bool IsPowerOfTwo( uint_t x )
     {
@@ -76,15 +82,15 @@ namespace TinyRT
         return v1[0]*v2[0] + v1[1]*v2[1] + v1[2]*v2[2];
     };
 
+
     //=====================================================================================================================
     /// \ingroup TinyRT
     //=====================================================================================================================
-    template< class Vec3f_T_1, class Vec3f_T_2 >
-    inline float Dot3( const Vec3f_T_1& a, const Vec3f_T_2& b )
+    template< class Scalar >
+    inline Scalar Dot3( const Vec3<Scalar>& a, const Vec3<Scalar>& b )
     {
         return a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
     };
-
 
     // ---------------------------------------------------------------------------------------------------
     //  Normalization

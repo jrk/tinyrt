@@ -31,7 +31,7 @@ namespace TinyRT
     {
     public:
 
-        typedef typename ObjectSet_T ObjectSet;
+        typedef  ObjectSet_T ObjectSet;
         typedef typename ObjectSet::obj_id   obj_id;
 
         inline MedianCutAABBTreeBuilder( uint32 nMaxLeafObjects=1 );
@@ -61,7 +61,7 @@ namespace TinyRT
         {
         public:
 
-            inline bool operator()( Object*& a, Object*& b ) const
+            inline bool operator()( const Object* a, const Object* b ) const
             {
                 return ( a->box.Min()[axis] < b->box.Min()[axis] );
             };

@@ -31,12 +31,12 @@ namespace TinyRT
     ///                         The cost function should return the cost of a ray-object intersection test, 
     ///                         relative to the cost of a node traversal
     //=====================================================================================================================
-    template< typename ObjectSet_T, typename CostFunction_T = ConstantCost<ObjectSet_T::obj_id> >
+    template< class ObjectSet_T, class CostFunction_T = ConstantCost<typename ObjectSet_T::obj_id> >
     class SahAABBTreeBuilder 
     {
     public:
 
-        typedef typename ObjectSet_T ObjectSet;
+        typedef ObjectSet_T ObjectSet;
         typedef typename ObjectSet::obj_id   obj_id;
 
         inline SahAABBTreeBuilder( const CostFunction_T& rCost );
@@ -66,7 +66,7 @@ namespace TinyRT
         {
         public:
 
-            inline bool operator()( Object*& a, Object*& b ) const
+            inline bool operator()( const Object* a, const Object* b ) const
             {
                 return ( (a->box.Min()[axis]+a->box.Max()[axis]) < 
                          (b->box.Min()[axis]+b->box.Max()[axis]) );

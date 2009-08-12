@@ -18,6 +18,7 @@
 
 namespace TinyRT
 {
+    class ScratchMemory;
 
     //=====================================================================================================================
     /// \ingroup TinyRT
@@ -87,46 +88,6 @@ namespace TinyRT
         size_t m_nRefCount;
     };
 
-    //=====================================================================================================================
-    /// \ingroup TinyRT
-    /// \brief A simple scoped array wrapper which uses TinyRT::ScratchMemory for allocation
-    ///
-    ///  The ScratchArray constructor allocates an array from a scratch memory pool, and its destructor releases that memory.
-    ///    Scratch arrays are meant to be constructed on the stack to hold temporary storage during raytracing operations.
-    ///    By using scratch arrays in this way, the allocations are guaranteed to be released in LIFO order.
-    ///
-    /// \sa ScratchMemory
-    ///
-    //=====================================================================================================================
-    template< class T >
-    class ScratchArray
-    {
-    public:
-
-        friend class ScratchMemory;
-
-        /// Allocates an array of the specified size from the given 'ScratchMemory' instance
-        ScratchArray( ScratchMemory& rMemory, size_t nSize ) 
-        {
-            std::pair<uint8*,ScratchPool*> mem = rMemory.Allocate<T>( nSize );
-            m_pPool = mem.second;
-            m_pSpace = reinterpret_cast<T*>( mem.first );
-        }
-
-        ~ScratchArray() { m_pPool->Free( reinterpret_cast<uint8*>( m_pSpace ) ); };
-
-        inline operator T*() { return m_pSpace; };
-        inline operator const T*() const { return m_pSpace; };
-
-    private:
-
-        // disallow copy and assignment
-        ScratchArray( const ScratchArray<T>& a ) {};
-        ScratchArray& operator=( const ScratchArray<T>& a ) { return *this; };
-
-        T* m_pSpace;
-        ScratchPool* m_pPool;
-    };
 
     //=====================================================================================================================
     /// \ingroup TinyRT
@@ -179,6 +140,49 @@ namespace TinyRT
         }
 
         ScratchPool* m_pStackPool;
+    };
+
+
+
+    //=====================================================================================================================
+    /// \ingroup TinyRT
+    /// \brief A simple scoped array wrapper which uses TinyRT::ScratchMemory for allocation
+    ///
+    ///  The ScratchArray constructor allocates an array from a scratch memory pool, and its destructor releases that memory.
+    ///    Scratch arrays are meant to be constructed on the stack to hold temporary storage during raytracing operations.
+    ///    By using scratch arrays in this way, the allocations are guaranteed to be released in LIFO order.
+    ///
+    /// \sa ScratchMemory
+    ///
+    //=====================================================================================================================
+    template< class T >
+    class ScratchArray
+    {
+    public:
+
+        friend class ScratchMemory;
+
+        /// Allocates an array of the specified size from the given 'ScratchMemory' instance
+        ScratchArray( ScratchMemory& rMemory, size_t nSize ) 
+        {
+            std::pair<uint8*,ScratchPool*> mem = rMemory.Allocate<T>( nSize );
+            m_pPool = mem.second;
+            m_pSpace = reinterpret_cast<T*>( mem.first );
+        }
+
+        ~ScratchArray() { m_pPool->Free( reinterpret_cast<uint8*>( m_pSpace ) ); };
+
+        inline operator T*() { return m_pSpace; };
+        inline operator const T*() const { return m_pSpace; };
+
+    private:
+
+        // disallow copy and assignment
+        ScratchArray( const ScratchArray<T>& a ) {};
+        ScratchArray& operator=( const ScratchArray<T>& a ) { return *this; };
+
+        T* m_pSpace;
+        ScratchPool* m_pPool;
     };
 
 

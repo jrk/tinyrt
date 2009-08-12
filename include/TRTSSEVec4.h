@@ -27,7 +27,7 @@ namespace TinyRT
     /// \ingroup TinyRT
     /// \brief A wrapper class for SIMD operations on integer values
     //=====================================================================================================================
-    class TRT_SIMDALIGN SSEVec4I
+    class SSEVec4I
     {
     public:
         
@@ -112,7 +112,7 @@ namespace TinyRT
     /// \ingroup TinyRT
     /// \brief Simd vector implementation using SSE
     //=====================================================================================================================
-    class TRT_SIMDALIGN SSEVec4
+    class SSEVec4
     {
     public:        
 

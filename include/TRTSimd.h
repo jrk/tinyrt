@@ -15,8 +15,11 @@
 #ifndef _TRT_SIMD_H_
 #define _TRT_SIMD_H_
 
-
-#define TRT_SIMDALIGN __declspec(align(16))
+#ifdef __GNUC__
+    #define TRT_SIMDALIGN   // GCC keeps the stack 16-byte aligned,  and it just spits warnings if we use __declspec(align())
+#else
+    #define TRT_SIMDALIGN __declspec(align(16))
+#endif
 
 #include "TRTSSEVec4.h"
 

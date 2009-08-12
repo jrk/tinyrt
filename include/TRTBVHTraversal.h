@@ -31,6 +31,7 @@ namespace TinyRT
     template< typename BVH_T, typename ObjectSet_T, typename HitInfo_T, typename Ray_T >
     void RaycastBVH( const BVH_T* pBVH, const ObjectSet_T* pObjects, Ray_T& rRay, HitInfo_T& rHitInfo, typename BVH_T::ConstNodeHandle pRoot, ScratchMemory& rScratch )
     {
+        typedef typename BVH_T::obj_id obj_id;
         typedef typename BVH_T::ConstNodeHandle NodeHandle;
         ScratchArray< NodeHandle > stack( rScratch, pBVH->GetStackDepth() );
         NodeHandle* pStack = stack;
@@ -41,15 +42,15 @@ namespace TinyRT
         while( pStack != pStackBottom )
         {
             pStack--;
-            BVH_T::ConstNodeHandle pNode = *pStack;
+            NodeHandle pNode = *pStack;
 
             while( pBVH->RayNodeTest( pNode, rRay ) )
             {
                 if( pBVH->IsNodeLeaf( pNode ) )
                 {
                     // intersect all objects in this leaf node, then proceed with next node from stack
-                    BVH_T::obj_id rFirstObj;
-                    BVH_T::obj_id rLastObj;
+                    obj_id rFirstObj;
+                    obj_id rLastObj;
                     pBVH->GetNodeObjectRange( pNode, rFirstObj, rLastObj );
 
                     while( rFirstObj != rLastObj )
@@ -63,8 +64,8 @@ namespace TinyRT
                 else
                 {
                     // inner node: Visit node's children
-                    BVH_T::ConstNodeHandle pLeft  = pBVH->GetLeftChild( pNode );
-                    BVH_T::ConstNodeHandle pRight = pBVH->GetRightChild( pNode );
+                    NodeHandle pLeft  = pBVH->GetLeftChild( pNode );
+                    NodeHandle pRight = pBVH->GetRightChild( pNode );
 
                     uint32 nAxis = pBVH->GetNodeSplitAxis( pNode );
                     if( rRay.Direction()[nAxis] < 0 )

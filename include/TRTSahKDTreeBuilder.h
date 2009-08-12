@@ -45,7 +45,6 @@ namespace TinyRT
     public:
 
         typedef typename ObjectSet_T::obj_id obj_id;
-        typedef typename ObjectSet_T::obj_id obj_id;
 
         /// \param fISectCost   Cost of an object intersection test, relative to a node traversal
         inline SahKDTreeBuilder( const CostFunction_T& rCostFunc ) :  m_costFunc(rCostFunc) {};
@@ -265,7 +264,7 @@ namespace TinyRT
             void Deallocate() 
             {
                 // release all allocations ever made for this type of list node
-                for( std::vector<T*>::iterator it = m_allocs.begin(); it != m_allocs.end(); ++it )
+                for( typename std::vector<T*>::iterator it = m_allocs.begin(); it != m_allocs.end(); ++it )
                     delete *it;
                 m_allocs.clear();
 

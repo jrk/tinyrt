@@ -60,7 +60,7 @@ namespace TinyRT
         rStats.nEmptyLeafs = 0;
         rStats.nNodes = 0;
     
-        typedef std::pair< Tree_T::ConstNodeHandle, size_t > StackItem;
+        typedef std::pair< typename Tree_T::ConstNodeHandle, size_t > StackItem;
 
         std::vector< StackItem > stack;
         stack.push_back( StackItem( pTree->GetRoot(), 0 ) );

@@ -45,6 +45,7 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
+				DisableLanguageExtensions="false"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -148,7 +149,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\src\ConceptCheck.cpp"
+				RelativePath=".\src\BVH.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\KDTree.cpp"
 				>
 			</File>
 		</Filter>
@@ -187,6 +192,10 @@
 			</File>
 			<File
 				RelativePath=".\include\TRTEpsilonRay.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\TRTMalloc.h"
 				>
 			</File>
 			<File

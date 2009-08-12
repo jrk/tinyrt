@@ -48,7 +48,7 @@ namespace TinyRT
     uint32 SahAABBTreeBuilder<ObjectSet_T, CostFunction_T>::BuildTree( ObjectSet* pObjects, AABBTree_T* pTree )
     {
         typedef typename AABBTree_T::NodeHandle NodeHandle;
-        
+     
         obj_id nObjects = pObjects->GetObjectCount();
        
         // object information
@@ -203,14 +203,15 @@ namespace TinyRT
         }
 
         // sort the pointer lists
-        std::sort( objectPtrs[0].begin(), objectPtrs[0].end(), SortObjects<0>() );
-        std::sort( objectPtrs[1].begin(), objectPtrs[1].end(), SortObjects<1>() );
-        std::sort( objectPtrs[2].begin(), objectPtrs[2].end(), SortObjects<2>() );
+        SortObjects<0> x; SortObjects<1> y; SortObjects<2> z;
+        std::sort( objectPtrs[0].begin(), objectPtrs[0].end(), x );
+        std::sort( objectPtrs[1].begin(), objectPtrs[1].end(), y );
+        std::sort( objectPtrs[2].begin(), objectPtrs[2].end(), z );
         
         // fill in the sort indices in the object structures
-        std::vector<Object*>::iterator itX = objectPtrs[0].begin();
-        std::vector<Object*>::iterator itY = objectPtrs[1].begin();
-        std::vector<Object*>::iterator itZ = objectPtrs[2].begin();
+        typename std::vector<Object*>::iterator itX = objectPtrs[0].begin();
+        typename std::vector<Object*>::iterator itY = objectPtrs[1].begin();
+        typename std::vector<Object*>::iterator itZ = objectPtrs[2].begin();
         for( obj_id i=0; i<nObjects; i++ )
         {
             (*itX)->nSortIndices[0] = i;

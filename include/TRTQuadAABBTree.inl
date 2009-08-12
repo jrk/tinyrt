@@ -35,7 +35,7 @@ namespace TinyRT
         m_leafInfo[0].nLastObj=0;
 
         // allocate the root node
-        m_pNodes = reinterpret_cast<Node*>( TRT_ALIGNED_MALLOC( sizeof(Node), SimdVec4f::ALIGN ));
+        m_pNodes = reinterpret_cast<Node*>( AlignedMalloc( sizeof(Node), SimdVec4f::ALIGN ));
     }
 
     //=====================================================================================================================
@@ -44,7 +44,7 @@ namespace TinyRT
     QuadAABBTree<ObjectSet_T>::~QuadAABBTree( )
     {
         if( m_pNodes )
-            TRT_ALIGNED_FREE( m_pNodes );
+            AlignedFree( m_pNodes );
     }
 
 

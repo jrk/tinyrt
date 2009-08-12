@@ -40,25 +40,27 @@ raytracing kernel.
 
 #include <vector>
 #include <limits>
+#include <float.h>
 #include <string.h> // for memcpy
 
 
-// TODO:  Support non-microsoft compilers....
-
-/// Macro to force function inlining
 #ifndef TRT_FORCEINLINE
-#define TRT_FORCEINLINE __forceinline
+
+    #ifdef __GNUC__
+
+        // If we use the GCC equivalent of __forceinline, GCC sometimes fails to inline things, and errors out when that happens...
+        
+        /// Macro to force function inlining
+        #define TRT_FORCEINLINE inline  
+    
+    #else
+
+        /// Macro to force function inlining
+        #define TRT_FORCEINLINE __forceinline
+
+    #endif
 #endif
 
-/// Macro for allocating aligned memory
-#ifndef TRT_ALIGNED_MALLOC
-#define TRT_ALIGNED_MALLOC(size,align) _aligned_malloc(size,align)
-#endif
-
-/// Macro for freeing aligned memory
-#ifndef TRT_ALIGNED_FREE
-#define TRT_ALIGNED_FREE(x) _aligned_free(x)
-#endif
 
 /// Minimum distance used for epsilon rays.  TRT clients may #define TRT_EPSILON to override its value
 #ifndef TRT_EPSILON
@@ -67,17 +69,25 @@ raytracing kernel.
 
 #include "TRTAssert.h"
 #include "TRTTypes.h"
+#include "TRTMalloc.h"
 #include "TRTSimd.h"
-#include "TRTScopedArray.h"
 #include "TRTMath.h"
 #include "TRTScratchMemory.h"
-#include "TRTObjectUtils.h"
+
 
 // Utility classes
 #include "TRTAxisAlignedBox.h"
 #include "TRTPacketFrustum.h"
 #include "TRTPerspectiveCamera.h"
+#include "TRTScopedArray.h"
+#include "TRTObjectUtils.h"
 
+
+// Analysis utilities
+#include "TRTTreeStatistics.h"
+#include "TRTCostMetric.h"
+
+// Rays
 #include "TRTRay.h"
 #include "TRTEPsilonRay.h"
 
@@ -115,10 +125,6 @@ raytracing kernel.
 #include "TRTKDTraversal.h"
 #include "TRTSahKDTreeBuilder.h"
 #include "TRTBoxClipper.h"
-
-// Analysis utilities
-#include "TRTTreeStatistics.h"
-#include "TRTCostMetric.h"
 
 
 

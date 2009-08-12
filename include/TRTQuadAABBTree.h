@@ -106,6 +106,43 @@ namespace TinyRT
         template< class QAABBBuilder_T >
         inline void Build( ObjectSet_T* pObjects, QAABBBuilder_T& rBuilder );
 
+
+
+        /// Returns a mask where each bit is 0 if the corresponding child is an empty leaf node, and 1 otherwise (LSB to MSB)
+        inline uint GetEmptyLeafMask( NodeHandle nNode ) const { 
+            TRT_ASSERT( !IsNodeLeaf(nNode) );
+            return LookupNode(nNode)->m_intersectMask; 
+        };
+
+        /// \brief Returns an value indicating the order of node traversals.  
+        /// The return value is a set of two-bit child indices, with the lowest order bits giving the index of the LAST child to traverse
+        inline uint8 GetChildTraversalOrder( NodeHandle nNode, uint nRayOctant ) const {
+            TRT_ASSERT( !IsNodeLeaf(nNode) );
+            return LookupNode(nNode)->m_traversalOrder[nRayOctant];
+        };
+    
+        inline float* GetChildAABBs( NodeHandle nNode ) const {
+            TRT_ASSERT( !IsNodeLeaf(nNode) );
+            return LookupNode(nNode)->m_bbox[0].values;
+        };
+
+        /// \brief Retrieves the AABB of a child of a node
+        /// \param nNode        Must be an inner node
+        /// \param nChildIdx    Index of the child node
+        /// \param rBoxOut      Receives the bounding box
+        inline void GetChildAABB( NodeHandle nNode, uint nChildIdx, AxisAlignedBox& rBoxOut ) const {
+            TRT_ASSERT( nChildIdx < BRANCH_FACTOR );
+
+            Node* pN = LookupNode(nNode);
+            float* pBBox = reinterpret_cast<float*>( &pN->m_bbox[0] );
+            rBoxOut.Min()[0] = pBBox[nChildIdx]; pBBox += 4;
+            rBoxOut.Max()[0] = pBBox[nChildIdx]; pBBox += 4;
+            rBoxOut.Min()[1] = pBBox[nChildIdx]; pBBox += 4;
+            rBoxOut.Max()[1] = pBBox[nChildIdx]; pBBox += 4;
+            rBoxOut.Min()[2] = pBBox[nChildIdx]; pBBox += 4;
+            rBoxOut.Max()[2] = pBBox[nChildIdx]; pBBox += 4;
+        }
+
     private:
 
         static const uint32 EMPTY_LEAF = 0x80000000;
@@ -133,9 +170,9 @@ namespace TinyRT
             if( m_nNodesInUse == m_nNodeArraySize )
             {
                 // reallocate
-                Node* pNewNodes = reinterpret_cast<Node*>( TRT_ALIGNED_MALLOC( sizeof(Node)*m_nNodeArraySize*2, SimdVec4f::ALIGN ) );
+                Node* pNewNodes = reinterpret_cast<Node*>( AlignedMalloc( sizeof(Node)*m_nNodeArraySize*2, SimdVec4f::ALIGN ) );
                 memcpy( pNewNodes, m_pNodes, sizeof(Node)*m_nNodesInUse );
-                TRT_ALIGNED_FREE( m_pNodes );
+                AlignedFree( m_pNodes );
                 m_pNodes = pNewNodes;
                 m_nNodeArraySize *= 2;
             }

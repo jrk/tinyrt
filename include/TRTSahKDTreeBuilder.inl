@@ -34,7 +34,7 @@ namespace TinyRT
         AxisAlignedBox rootAABB;
         CreateLists( pObjects, splitLists, objectList, rootAABB );
 
-        KDTree_T::NodeHandle hRoot = pTree->Initialize( rootAABB );
+        typename KDTree_T::NodeHandle hRoot = pTree->Initialize( rootAABB );
 
         uint nDepth = BuildTreeRecurse( rootAABB, pObjects, splitLists, objectList, pTree, pTree->GetRoot() );
 
@@ -58,7 +58,7 @@ namespace TinyRT
                                                                                AxisAlignedBox& rootAABB )
     {
    
-        ObjectSet_T::obj_id nObjects = pObjects->GetObjectCount();
+        typename ObjectSet_T::obj_id nObjects = pObjects->GetObjectCount();
 
         // allocate list nodes
         SplitEvent* pEvents = m_splitListHelper.AllocateArray( 6*nObjects );
@@ -68,7 +68,7 @@ namespace TinyRT
         rootAABB.Min() = Vec3f( FLT_MAX,FLT_MAX,FLT_MAX );
         rootAABB.Max() = Vec3f( -FLT_MAX, -FLT_MAX, -FLT_MAX );
 
-        for( ObjectSet_T::obj_id i=0; i< nObjects; i++ )
+        for( typename ObjectSet_T::obj_id i=0; i< nObjects; i++ )
         {
             pObjects->GetObjectAABB( i, pObjectInfo[i].bbox );
             pObjectInfo[i].nObject = i;
@@ -143,6 +143,8 @@ namespace TinyRT
                                                                                  KDTree_T* pTree,
                                                                                  typename KDTree_T::NodeHandle hNode )
     {
+        typedef typename KDTree_T::NodeHandle NodeHandle;
+
         SplitSelection splitSelection;
         if( !SelectSplit( rRootBB, rObjectList, pEventLists, splitSelection ) )
         {
@@ -199,7 +201,7 @@ namespace TinyRT
                 ClipStraddlingObjects( pObjects, splitSelection, objectsByClass, pEventListsLeft, pEventListsRight  );
 
                 // make this node an inner node
-                std::pair<KDTree_T::NodeHandle, KDTree_T::NodeHandle> kids =
+                std::pair<NodeHandle, NodeHandle> kids =
                     pTree->MakeInnerNode( hNode, splitSelection.fPosition, splitSelection.nAxis );
 
                 // cut the AABB, and recurse
@@ -216,7 +218,7 @@ namespace TinyRT
             else if( splitSelection.eSideWithObjects == LEFT )
             {
                 // right child is an empty leaf.  Construct on left
-                std::pair<KDTree_T::NodeHandle, KDTree_T::NodeHandle> kids =
+                std::pair<NodeHandle, NodeHandle> kids =
                     pTree->MakeInnerNode( hNode, splitSelection.fPosition, splitSelection.nAxis );
 
                 pTree->MakeLeafNode( kids.second, 0 );
@@ -229,7 +231,7 @@ namespace TinyRT
             else //( splitSelection.eSideWithObjects == RIGHT )
             {
                 // left child is an empty leaf.  Construct on right
-                std::pair<KDTree_T::NodeHandle, KDTree_T::NodeHandle> kids =
+                std::pair<NodeHandle, NodeHandle> kids =
                     pTree->MakeInnerNode( hNode, splitSelection.fPosition, splitSelection.nAxis );
 
                 pTree->MakeLeafNode( kids.first, 0 );
@@ -250,97 +252,10 @@ namespace TinyRT
                                                                                SplitList eventLists[3], 
                                                                                SplitSelection& rSplitOut )
     {
-/*    
-        if( nObjects == 0 )
-            return false;
-
-        float fBestCost = m_fISectCost * nObjects;
-        bool bHaveSplit = false;
-        
-        Vec3f vBBSize = rRootBB.Max() - rRootBB.Min();
-        float fInvRootAreaTimesCost = m_fISectCost / ( vBBSize.x*( vBBSize.y + vBBSize.z ) + vBBSize.y*vBBSize.z );
-
-        for( uint i=0; i<3; i++ )
-        {
-            uint nLeft  = 0;
-            uint nRight = static_cast<uint>(nObjects);
-
-            // surface area of a box is:  2xy + 2yz + 2xz
-            //  If we factor out the dimension that is changing (X, say), we have:
-            //    2X(Y+Z) + 2YZ.  
-            // (Or, 2X*B + 2A).  Note that the factors of two cancel out, and we can pre-multiply by the other stuff
-            uint nY = (i+1)%3;
-            uint nZ = (i+2)%3;
-
-            float fAlpha = ( vBBSize[nY] * vBBSize[nZ] ) * fInvRootAreaTimesCost ;
-            float fBeta  = ( vBBSize[nY] + vBBSize[nZ] ) * fInvRootAreaTimesCost ;
-
-            // cycle through potential split planes
-            SplitEvent* pSplit = eventLists[i].pHead;
-            while( pSplit != NULL )
-            {
-                // figure out how the object distribution changes at this split plane location
-                uint nEventsThisPlane[3] = { 0,0,0 };
-                float fPlanePos = pSplit->fPosition;
-
-                TRT_ASSERT( rRootBB.Min()[i] <= fPlanePos && rRootBB.Max()[i] >= fPlanePos );
-
-                do
-                {
-                    nEventsThisPlane[pSplit->nEventType]++;
-                    pSplit = pSplit->pNext;
-
-                } while( pSplit != NULL && pSplit->fPosition == fPlanePos );
-
-                // move onto this plane
-                nRight -= ( nEventsThisPlane[IN_PLANE] + nEventsThisPlane[END] );
-
-                // evaluate SAH (nLeft, nInThisPlane, nRight )
-                float fXL = fPlanePos - rRootBB.Min()[i];
-                float fXR = rRootBB.Max()[i] - fPlanePos;
-                float fPL = ( fXL*fBeta + fAlpha );
-                float fPR = ( fXR*fBeta + fAlpha );
-
-                float fSAHLeft  = 1.0f + fPL*( nLeft + nEventsThisPlane[IN_PLANE] ) + fPR*( nRight );
-                float fSAHRight = 1.0f + fPL*( nLeft ) + fPR*( nRight + nEventsThisPlane[IN_PLANE] );
-
-                // choose a side to put the 'in-plane' objects on
-                Side eSide = (fSAHLeft < fSAHRight) ? LEFT : RIGHT;
-                float fCost = (fSAHLeft < fSAHRight) ? fSAHLeft : fSAHRight;
-
-                // keep this split if it is best so far
-                if( fCost < fBestCost )
-                {
-                    bHaveSplit = true;
-                    rSplitOut.nAxis = i;
-                    rSplitOut.eSide = eSide;
-                    rSplitOut.fPosition = fPlanePos;
-                    
-                    uint nObjsLeft  = ( eSide == LEFT ) ? nLeft + nEventsThisPlane[IN_PLANE] : nLeft;
-                    uint nObjsRight = ( eSide == RIGHT ) ? nRight + nEventsThisPlane[IN_PLANE] : nRight;
-                    if( nObjsLeft != 0 && nObjsRight != 0 )
-                        rSplitOut.eSideWithObjects = BOTH;
-                    else if( nObjsLeft != 0 )
-                        rSplitOut.eSideWithObjects = LEFT;
-                    else
-                        rSplitOut.eSideWithObjects = RIGHT;
-
-                    fBestCost = fCost;
-                }
-
-                // move past this plane
-                nLeft += ( nEventsThisPlane[IN_PLANE] + nEventsThisPlane[START] );
-            }
-        }
-
-        return bHaveSplit;
-        */
-
         uint nObjects = rObjects.nObjects;
         if( nObjects == 0 )
             return false;
-
-        
+   
         Vec3f vBBSize = rRootBB.Max() - rRootBB.Min();
         float fInvRootArea = 1.0f / ( vBBSize.x*( vBBSize.y + vBBSize.z ) + vBBSize.y*vBBSize.z );
 

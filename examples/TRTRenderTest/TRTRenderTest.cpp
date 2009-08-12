@@ -259,7 +259,7 @@ int main()
 
     RenderTest::Options renderOpts;
     renderOpts.dumpFilePrefix = "test";
-    renderOpts.goldImagePrefix = "goldimages\\bunny\\test";
+    renderOpts.goldImagePrefix = "";//"goldimages\\bunny\\test";
     renderOpts.nImageSize = 256;
     renderOpts.nTileSize = 4;
 

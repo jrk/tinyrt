@@ -71,6 +71,18 @@ namespace TinyRT
         //=====================================================================================================================
         /// This method searches the entire cache for a reference to a particular object. 
         //=====================================================================================================================
+#ifdef __GNUC__
+        template< int n >
+        inline bool CheckEntireCache( const ObjectRef_T& rObject ) const
+        {
+            for( uint i=0; i<n; i++ )
+            {
+                if( m_cache[SIZE-n] == rObject )
+                    return true;
+            }
+            return false;
+        }
+#else
         template< int n >
         inline bool CheckEntireCache( const ObjectRef_T& rObject ) const
         {
@@ -82,6 +94,7 @@ namespace TinyRT
         {
             return m_cache[SIZE-1] == rObject;
         }
+#endif
 
         ObjectRef_T m_cache[SIZE];
         size_t m_nCount;
