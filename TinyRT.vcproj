@@ -410,6 +410,10 @@
 		<Filter
 			Name="Doc"
 			>
+			<File
+				RelativePath=".\Doc\TinyRT-README.txt"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>
