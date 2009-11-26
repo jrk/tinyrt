@@ -35,7 +35,7 @@ namespace TinyRT
         /// Allocates memory
         uint8* Alloc( size_t nSize ) 
         {
-            nSize = (3 + nSize) & ~(3); // round allocation size up to next multiple of four
+            nSize = (TRT_SIMD_ALIGNMENT + nSize) & ~(TRT_SIMD_ALIGNMENT); // round allocation size up to next multiple of SIMD align
 
             // no space.  fail
             if( ((m_pNextAddr-m_pBaseAddr) + nSize) > m_nSize )
@@ -65,7 +65,7 @@ namespace TinyRT
             m_nRefCount--;
             if( m_nRefCount == 0 )
             {
-                delete[] m_pBaseAddr;
+                TinyRT::AlignedFree( m_pBaseAddr );
                 delete this;
             }
         }
@@ -135,7 +135,7 @@ namespace TinyRT
 
         void CreatePool( size_t nSize )
         {
-            uint8* pPool = new uint8[nSize];
+            uint8* pPool = reinterpret_cast<uint8*>( TinyRT::AlignedMalloc( nSize, TRT_SIMD_ALIGNMENT ) ); 
             m_pStackPool = new ScratchPool( pPool, nSize );
         }
 

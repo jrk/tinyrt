@@ -23,6 +23,8 @@
 
 #include "TRTSSEVec4.h"
 
+#define TRT_SIMD_ALIGNMENT 16
+
 namespace TinyRT
 {
     typedef SSEVec4  SimdVec4f;   ///< Typedef corresponding to a four-component SIMD vector type
