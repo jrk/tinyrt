@@ -105,6 +105,12 @@ namespace TinyRT
 
         /// Converts from integer to floating point
         inline SSEVec4 ToFloat() const;
+
+        /// Returns a four-bit mask containing the high bits of each vector component
+        static inline int Mask( const SSEVec4I& v )
+        {
+            return _mm_movemask_ps( _mm_castsi128_ps(v.vec128) );
+        };
     };
 
 
@@ -251,6 +257,11 @@ namespace TinyRT
             return ( (A & condition) )  | AndNot( condition, B );
         };
 
+        /// Executes a conditional move.  For each component, returns (!condition) ? A : B;
+        static inline SSEVec4 SelectNot( const SSEVec4& condition, const SSEVec4& A, const SSEVec4& B )
+        {
+            return ( (B & condition) )  | AndNot( condition, A );
+        };
         
         // horizontal operations
 
