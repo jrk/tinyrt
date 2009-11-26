@@ -36,6 +36,9 @@ namespace TinyRT
         typedef typename ObjectSet_T::obj_id obj_id;
         typedef const obj_id* CellIterator;
 
+        typedef uint32 UnsignedCellIndex;
+        typedef int32 SignedCellIndex;
+
         /// Returns the bounding box of the grid
         inline const AxisAlignedBox& GetBoundingBox() const { return m_boundingBox; };
 

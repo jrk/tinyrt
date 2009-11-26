@@ -349,20 +349,22 @@ namespace TinyRT
     {
         typedef unsigned int obj_id;     ///< Type used as an object identifier. Must be an integral type
         typedef obj_id* CellIterator; ///< Type that acts as an iterator over objects.  Must support standard iterator semantics
-        
+            
+        typedef uint32 UnsignedCellIndex;   ///< Type used as a cell index (unsigned)
+        typedef int32 SignedCellIndex;      ///< Signed type with the same bit width as 'UnsignedCellIndex
 
         /// Returns the bounding box of the grid
         virtual const AxisAlignedBox& GetBoundingBox() const =0;
 
         /// Returns the number of grid cells along each axis
-        virtual Vec3<uint32>& GetCellCounts() const = 0;
+        virtual Vec3<UnsignedCellIndex>& GetCellCounts() const = 0;
 
         /// Returns the number of objects in a cell list.  
         /// \param pCell    The cell list.  May NOT be NULL
-        virtual size_t GetCellObjectCount( const Vec3<uint32>& rCell ) const = 0;
+        virtual size_t GetCellObjectCount( const Vec3<UnsignedCellIndex>& rCell ) const = 0;
 
         /// Retrieves a list of objects stored in a particular cell
-        virtual void GetCellObjectList( const Vec3<uint32>& rCell, CellIterator& hCellStart, CellIterator& hCellEnd ) const =0; 
+        virtual void GetCellObjectList( const Vec3<UnsignedCellIndex>& rCell, CellIterator& hCellStart, CellIterator& hCellEnd ) const =0; 
         
     };
 

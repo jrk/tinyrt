@@ -14,19 +14,39 @@
 
 namespace TinyRT
 {
-
+    //=====================================================================================================================
+    /// \ingroup TinyRT
+    /// \brief Structure which maintains the state of a DDA through a 3D grid
+    ///
+    /// The template parameters control how many bits are used for cell indices.  Unsigned_T and Signed_T must
+    ///  be the corresponding unsigned and signed integer types for a particular bit width
+    //=====================================================================================================================
+    template< typename Unsigned_T, typename Signed_T >
     struct DDAState
     {
-        Vec3<uint32> vCellIndices;      ///< Current position in the grid
-        Vec3<uint32> vCellCounts;       ///< Number of cells in the grid
-        Vec3<int32>  vStepSigns;        ///< Directions to step in (1 if positive, -1 if negative)
-        Vec3f        vTNext;            ///< Distance to next cell boundary
-        Vec3f        vDeltaT;           ///< Change in T per single-cell step in X,Y,Z
+        Vec3<Unsigned_T> vCellIndices;      ///< Current position in the grid
+        Vec3<Unsigned_T> vCellCounts;       ///< Number of cells in the grid
+        Vec3<Signed_T>  vStepSigns;         ///< Directions to step in (1 if positive, -1 if negative)
+        Vec3f        vTNext;                ///< Distance to next cell boundary
+        Vec3f        vDeltaT;               ///< Change in T per single-cell step in X,Y,Z
     };
 
+    //=====================================================================================================================
+    /// \ingroup TinyRT
+    /// \brief Sets up a DDA through a 3D grid.  
+    ///
+    /// \param rRay     The ray to be traversed through the grid
+    /// \param pGrid    A grid through which the ray is to be traversed
+    /// \param rState   DDA state structure which is initialized for traversal of the ray through the grid
+    /// 
+    /// \param Ray_T         Must implement the Ray_C concept
+    /// \param UniformGrid_T Must implement the UniformGrid_C concept
+    /// \param DDA_T         Must be an instance of TinyRT::DDAState
+    //=====================================================================================================================
     template< typename Ray_T,
-              typename UniformGrid_T >
-    TRT_FORCEINLINE bool DDAInit( Ray_T& rRay, UniformGrid_T* pGrid, DDAState& rState )
+              typename UniformGrid_T,
+              typename DDA_T >
+    TRT_FORCEINLINE bool DDAInit( const Ray_T& rRay, const UniformGrid_T* pGrid, DDA_T& rState )
     {
         const AxisAlignedBox& rBox = pGrid->GetBoundingBox();
 
@@ -75,8 +95,20 @@ namespace TinyRT
         return true;
     }
 
-    template< typename Ray_T >
-    TRT_FORCEINLINE bool DDAStep( DDAState& rState, const Ray_T& rRay )
+    
+    //=====================================================================================================================
+    /// \ingroup TinyRT
+    /// \brief Steps to the next cell in a uniform grid
+    /// \param rState    A DDA state structure built by 'TinyRT::DDAInit'
+    /// \param rRay      The ray used in the call to 'TinyRT::DDAInit'
+    /// \return True if the ray continued to the next cell.  False if the ray has left the grid, or if the 
+    ///             next cell is beyond the ray's valid disatance
+    ///
+    /// \param DDA_T            An instance of the TinyRT::DDAState template
+    /// \param Ray_T            Must implement the Ray_C concept
+    //=====================================================================================================================
+    template< typename DDA_T, typename Ray_T >
+    TRT_FORCEINLINE bool DDAStep( DDA_T& rState, const Ray_T& rRay )
     {
         if( rState.vTNext[1] < rState.vTNext[0] )
         {
@@ -161,7 +193,8 @@ namespace TinyRT
         const ObjectSet_T& rObjects = *pObjects;
            
         // DDA setup
-        DDAState ddaState;
+        DDAState<typename UniformGrid_T::UnsignedCellIndex,
+                 typename UniformGrid_T::SignedCellIndex > ddaState;
         if( !DDAInit( rRay, pGrid, ddaState ) )
             return; // missed grid completely
 
