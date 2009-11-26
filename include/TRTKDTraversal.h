@@ -88,11 +88,19 @@ namespace TinyRT
                 float fD     = rRayDirectionInv[axis];
                 float fTHit  = ( fSplit - fO ) * fD;
 
-                typename KDTree_T::ConstNodeHandle pNear = pTree->GetLeftChild( pNode );
-                typename KDTree_T::ConstNodeHandle pFar  = pTree->GetRightChild( pNode );
+                typename KDTree_T::ConstNodeHandle pNear;
+                typename KDTree_T::ConstNodeHandle pFar;
                 if( fD < 0 )
-                    std::swap( pNear, pFar );
-
+                {
+                    pNear = pTree->GetRightChild(pNode);
+                    pFar  = pTree->GetLeftChild(pNode);
+                }
+                else
+                {
+                    pNear = pTree->GetLeftChild(pNode);
+                    pFar  = pTree->GetRightChild(pNode);
+                }
+                    
                 if( fTHit > fTMax )
                 {
                     // hit near only
@@ -134,6 +142,7 @@ namespace TinyRT
             fTMax = pStack->fTMax;
 
         } // end of infinite traversal loop
+
     }
 }
 #endif // _TRTKDTRAVERSAL_H_
