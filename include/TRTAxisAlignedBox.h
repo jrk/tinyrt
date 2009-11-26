@@ -64,9 +64,12 @@ namespace TinyRT
         /// Expands this box to include the specified box
         inline void Merge( const AxisAlignedBox& rBox );
 
-        /// Checks whether the intersection of two boxes is non-empty
+        /// Checks whether the argument box is fully contained in the calling box
         inline bool Contains( const AxisAlignedBox& rBox ) const;
-
+        
+        /// Checks whether the intersection of two boxes is non-empty
+        inline bool Intersects( const AxisAlignedBox& rBox ) const;
+        
         /// Cuts an AABB using an axis-aligned split plane
         inline void Cut( uint nAxis, float fLocation, AxisAlignedBox& rLeft, AxisAlignedBox& rRight ) const;
 

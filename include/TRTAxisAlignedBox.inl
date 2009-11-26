@@ -78,6 +78,19 @@ namespace TinyRT
     }
 
     //=====================================================================================================================
+    //=====================================================================================================================
+    inline bool AxisAlignedBox::Intersects( const AxisAlignedBox& rBox ) const
+    {
+        if( m_min.x > rBox.m_max.x ) return false;
+        if( m_min.y > rBox.m_max.y ) return false;
+        if( m_min.z > rBox.m_max.z ) return false;
+        if( m_max.x < rBox.m_min.x ) return false;
+        if( m_max.y < rBox.m_min.y ) return false;
+        if( m_max.z < rBox.m_min.z ) return false;
+        return true;
+    }
+
+    //=====================================================================================================================
     /// This method assumes that the given cutting plane actually intersects the box
     /// \param nAxis        The axis to cut on (0,1,2 for X,Y,or Z)
     /// \param fLocation    Location to cut at
