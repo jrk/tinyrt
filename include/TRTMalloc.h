@@ -45,8 +45,11 @@ namespace TinyRT
     //=====================================================================================================================
     inline void AlignedFree( void* pMemory )
     {
-        uint8* pBytes = reinterpret_cast<uint8*>( pMemory );
-        free( pBytes - pBytes[-1] );
+        if( pMemory )
+        {
+            uint8* pBytes = reinterpret_cast<uint8*>( pMemory );
+            free( pBytes - pBytes[-1] );
+        }
     }
 
     
