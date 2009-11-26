@@ -1,3 +1,18 @@
+    Copyright (C) 2009 Joshua Barczak
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 
 What is TinyRT??
 ----------------
@@ -9,6 +24,7 @@ Its main goals are:
  - To provide a flexible reference codebase for research, prototyping, and hobbyist experimentation
  - To provide baseline components which may be modified for use in a production renderer
  - To provide a ready-made solution for 'lightweight' raytracing applications (such as collision detection)
+
 
 
 
@@ -34,11 +50,7 @@ In addition, The 'examples' directory contains several sample projects:
 What isn't TinyRT (FOR NOW)??
 ------------------------------
 
-* Cross platform
-    At the moment, TinyRT will only compile using Visual C++.  Testing and fixing for GCC are on the ToDo list.
-
 * A packet tracer
-
     Eventually, I may add some generic packet tracing functionality to TinyRT, but at the moment, it is single ray only.
 
 
@@ -57,3 +69,13 @@ What isn't TinyRT (EVER)??
     for a particular data structure.  If maximum performance is desired, it may be best to pair one of TRT's data structures with a
     custom raytracing kernel that is specialized for it.
 
+
+Changes in Version 1.1
+---------------------------
+
+- Fixes to support compilation with GCC (tested with DevC++ 4.2)
+- Reflect/Refract functions
+- Added aligned allocation helpers 
+- Scratch memory is now 16-byte aligned
+- Uniform grid DDA now uses a templated cell index type.  
+- added a static(compile-time) assert macro
