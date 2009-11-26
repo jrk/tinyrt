@@ -18,11 +18,22 @@
 #include <assert.h>
 
 #ifndef TRT_ASSERT
-
 /// Library clients may #define TRT_ASSERT to substitute their own assertion mechanism 
 #define TRT_ASSERT(x) assert(x); 
-//#define TRT_ASSERT(x) if(!(x)) { printf("FOO: %s : %s", __FILE__, __LINE__ ); }
-
 #endif
+
+namespace TinyRT
+{
+    template< bool b >  struct StaticAssertFailure;
+    template<> struct StaticAssertFailure<true> { };
+
+    template<int s >
+    struct StaticAssertTest
+    {
+    };
+}
+
+/// Compile-time assertion macro
+#define TRT_STATIC_ASSERT(x) typedef TinyRT::StaticAssertTest< sizeof( TinyRT::StaticAssertFailure< (bool)(x) >) >  StaticAssert;
 
 #endif // _TRT_ASSERT_H_
