@@ -239,41 +239,51 @@ namespace TinyRT
     ///
     /// \brief Performs an intersection test between a ray and a vectorized set of AABBs.  
     ///
-    /// This version uses a precomputed array of direction signs to avoid additional SIMD instructions (at the expense of more address arithmetic).
+    /// This version uses precomputed arrays of values to optimize the calculation
     ///  
     /// \param vAABB        Array containing sets of four AABB slabs.  The order is:  XMin,XMax, YMin,YMax, ZMin,ZMax
+    /// \param vSIMDRay     Array containing pre-swizzled ray information.  Elements 0 and 1 contain the x coordinates of
+    ///                         the reciprocal direction and origin, respectively.  Remaining elements contain the Y and Z coordinates
+    ///                          in the same order
+    ///
     /// \param rRay         The ray to be tested
-    /// \param nDirSigns    Array containing 1 if the corresponding direction component is negative, zero otherwise
+    /// \param nDirSigns    Array containing 16 if the corresponding ray direction component is negative, zero otherwise
     /// \return A four-bit mask indicating which AABBs were hit by the ray
     //=====================================================================================================================
     template< class Ray_T >
-    TRT_FORCEINLINE int RayQuadAABBTest( const SimdVec4f vAABB[6], const Ray_T& rRay, const int nDirSigns[3] )
+    TRT_FORCEINLINE int RayQuadAABBTest( const SimdVec4f vAABB[6], const SimdVec4f vSIMDRay[6], const Ray_T& rRay, const int nDirSigns[3] )
     {
-        const Vec3f& rOrigin = rRay.Origin();
-        const Vec3f& rInvDir = rRay.InvDirection();
-
+        // storing byte addresses for the slabs instead of just sign-bits removes some address arithmetic 
+        const char* pBoxes = reinterpret_cast< const char* >( vAABB );
+        SimdVec4f vXMin = SimdVec4f( (float*) (pBoxes + nDirSigns[0]) );
+        SimdVec4f vXMax = SimdVec4f( (float*) (pBoxes + (1*sizeof(SimdVec4f) - nDirSigns[0])));
+        SimdVec4f vYMin = SimdVec4f( (float*) (pBoxes + (2*sizeof(SimdVec4f) + nDirSigns[1])));
+        SimdVec4f vYMax = SimdVec4f( (float*) (pBoxes + (3*sizeof(SimdVec4f) - nDirSigns[1])));
+        SimdVec4f vZMin = SimdVec4f( (float*) (pBoxes + (4*sizeof(SimdVec4f) + nDirSigns[2])));
+        SimdVec4f vZMax = SimdVec4f( (float*) (pBoxes + (5*sizeof(SimdVec4f) - nDirSigns[2])));
+        
         // intersect with X aligned slabs 
-        SimdVec4f vDirInvX = SimdVec4f( rInvDir.x );
-        SimdVec4f vTMin  = (vAABB[ 0 + nDirSigns[0] ] - SimdVec4f( rOrigin[0] )) * vDirInvX;
-        SimdVec4f vTMax  = (vAABB[ 1 - nDirSigns[0] ] - SimdVec4f( rOrigin[0] )) * vDirInvX;
+        SimdVec4f vDirInvX = vSIMDRay[0];
+        SimdVec4f vTMin  = (vXMin - vSIMDRay[1] ) * vDirInvX;
+        SimdVec4f vTMax  = (vXMax - vSIMDRay[1] ) * vDirInvX;
 
         // Y aligned slabs
-        SimdVec4f vDirInvY = SimdVec4f( rInvDir.y );
-        SimdVec4f vTYIn  = (vAABB[ 2 + nDirSigns[1] ] - SimdVec4f( rOrigin[1] )) * vDirInvY;
-        SimdVec4f vTYOut = (vAABB[ 3 - nDirSigns[1] ] - SimdVec4f( rOrigin[1] )) * vDirInvY;
+        SimdVec4f vDirInvY = vSIMDRay[2];
+        SimdVec4f vTYIn  = (vYMin - vSIMDRay[3] ) * vDirInvY;
+        SimdVec4f vTYOut = (vYMax - vSIMDRay[3] ) * vDirInvY;
         vTMin = SimdVec4f::Max( vTYIn, vTMin ); // we want to grab the largest min and smallest max
         vTMax = SimdVec4f::Min( vTYOut, vTMax );
 
         // Z aligned slabs
-        SimdVec4f vDirInvZ = SimdVec4f( rInvDir.z );
-        SimdVec4f vTZIn  = (vAABB[ 4 + nDirSigns[2] ] - SimdVec4f( rOrigin[2] )) * vDirInvZ;
-        SimdVec4f vTZOut = (vAABB[ 5 - nDirSigns[2] ] - SimdVec4f( rOrigin[2] )) * vDirInvZ;
+        SimdVec4f vDirInvZ = vSIMDRay[4];
+        SimdVec4f vTZIn  = (vZMin - vSIMDRay[5] ) * vDirInvZ;
+        SimdVec4f vTZOut = (vZMax - vSIMDRay[5] ) * vDirInvZ;
         vTMin = SimdVec4f::Max( vTZIn, vTMin );
         vTMax = SimdVec4f::Min( vTZOut, vTMax );
 
-        // did we hit any of them? If so, return now
         return ( SimdVecf::Mask( (vTMin <= vTMax) & rRay.AreIntervalsValid( vTMin, vTMax ) ) );
     }
+
 }
 
 #endif // _TRT_BOXINTERSECT_H_

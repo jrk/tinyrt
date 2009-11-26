@@ -27,15 +27,18 @@ namespace TinyRT
     //=====================================================================================================================
     template< class ObjectSet_T >
     QuadAABBTree<ObjectSet_T>::QuadAABBTree( )
-    : m_pNodes(0), m_nNodeArraySize(1), m_nNodesInUse(1)
+    : m_pNodes(0), m_nNodeArraySize(1), m_nNodesInUse(1),
+      m_pLeafObjects(0), m_nLeafArraySize(1), m_nLeafsInUse(1)
     {
         // allocate a sentinal leaf to point empty leaf pointers at
-        m_leafInfo.resize( 1 );
-        m_leafInfo[0].nFirstObj=0;
-        m_leafInfo[0].nLastObj=0;
+        m_pLeafObjects = new LeafObjects[1];
+        m_pLeafObjects->nFirstObj=0;
+        m_pLeafObjects->nLastObj=0;
 
         // allocate the root node
         m_pNodes = reinterpret_cast<Node*>( AlignedMalloc( sizeof(Node), SimdVec4f::ALIGN ));
+
+
     }
 
     //=====================================================================================================================
@@ -45,6 +48,8 @@ namespace TinyRT
     {
         if( m_pNodes )
             AlignedFree( m_pNodes );
+        if( m_pLeafObjects )
+            delete[] m_pLeafObjects;
     }
 
 
@@ -171,22 +176,25 @@ namespace TinyRT
     /// \param nNode    The node to be tested
     /// \param rRay     The ray
     /// \param pStack   The traversal stack.  Each time a hit is found, it is placed on the stack, and the stack is incremented
-    /// \param nDirSigns    Elements 0-2 contain the sign bits of the ray directions, element 3 contains a mask
-    ///                      formed as follows:  signs[2]<<2 | signs[1]<<1 | signs[0].  This encodes the octant index of the ray
+    /// \param vSIMDRay    Pre-swizzled ray information.  See RayQuadAABBTest
+    /// \param nDirSigns    Elements 0-2 contain 16 if the corresponding ray direction component is negative, 0 otherwise.
+    ///                        Element 3 contains a mask formed as follows:  signs[2]<<2 | signs[1]<<1 | signs[0].  
+    ///                        This encodes the octant index of the ray
     /// \return The node stack
     //=====================================================================================================================
     template< class ObjectSet_T >
     template< class Ray_T >
     TRT_FORCEINLINE
     typename QuadAABBTree<ObjectSet_T>::ConstNodeHandle* QuadAABBTree<ObjectSet_T>::RayIntersectChildren( ConstNodeHandle nNode, 
-                                                                                                       const Ray_T& rRay, 
+                                                                                                        const SimdVec4f vSIMDRay[6],                                                                                                   
+                                                                                                        const Ray_T& rRay, 
                                                                                                        ConstNodeHandle* pStack, 
                                                                                                        const int nDirSigns[4] ) const
     {
         Node* pNode = LookupNode( nNode );
         
         // test ray against child node AABBs
-        int nHit = RayQuadAABBTest( pNode->m_bbox, rRay, nDirSigns );
+        int nHit = RayQuadAABBTest( pNode->m_bbox, vSIMDRay, rRay, nDirSigns );
         
         // exclude empty leaves
         nHit = nHit & pNode->m_intersectMask; 
@@ -199,11 +207,12 @@ namespace TinyRT
 
         int nOctant = nDirSigns[3];
         int nOrder = pNode->m_traversalOrder[nOctant];
+          
         for(int i=0; i<4; i++ )
         {
             uint nChild = nOrder & 3;    // nOrder % 4
-            if( nHit & ( 1<< nChild ) )
-                *(pStack++) = pNode->m_children[ nChild ];
+            *pStack = pNode->m_children[nChild];
+            pStack += (( nHit >> nChild ) & 1); // conditionally increment the stack. For incoherent rays, this is faster than branching
             nOrder >>= 2;
         }
 
@@ -215,8 +224,8 @@ namespace TinyRT
     template< class ObjectSet_T >
     inline void QuadAABBTree<ObjectSet_T>::GetMemoryUsage( size_t& rnBytesUsed, size_t& rnBytesAllocated ) const
     {
-        rnBytesUsed = m_nNodesInUse*sizeof(Node) + m_leafInfo.size()*sizeof(LeafObjects);
-        rnBytesAllocated = m_nNodeArraySize*sizeof(Node) + m_leafInfo.capacity()*sizeof(LeafObjects);
+        rnBytesUsed = m_nNodesInUse*sizeof(Node) + m_nLeafsInUse*sizeof(LeafObjects);
+        rnBytesAllocated = m_nNodeArraySize*sizeof(Node) + m_nLeafArraySize*sizeof(LeafObjects);
     }
 
     //=====================================================================================================================

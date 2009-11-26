@@ -32,13 +32,24 @@ namespace TinyRT
         typedef typename MBVH_T::ConstNodeHandle ConstNodeHandle;
         typedef typename MBVH_T::obj_id obj_id;
 
-        const Vec3f& rDir = rRay.Direction();
+        const Vec3f& rOrigin = rRay.Origin();
+        const Vec3f& rInvDir = rRay.InvDirection();
+
         int nDirSigns[4] = {
-            rDir.x > 0 ? 0 : 1,
-            rDir.y > 0 ? 0 : 1,
-            rDir.z > 0 ? 0 : 1
+            rInvDir.x > 0 ? 0 : 1,
+            rInvDir.y > 0 ? 0 : 1,
+            rInvDir.z > 0 ? 0 : 1
         };
-        nDirSigns[3] =  (nDirSigns[2] << 2) | (nDirSigns[1] << 1) | nDirSigns[0];
+        nDirSigns[3] =  (nDirSigns[2] << 2) | (nDirSigns[1] << 1) | (nDirSigns[0]);
+        nDirSigns[0] <<= 4;
+        nDirSigns[1] <<= 4;
+        nDirSigns[2] <<= 4;
+
+        SimdVec4f vSIMDRay[6] = {
+            SimdVec4f( rInvDir.x ), SimdVec4f( rOrigin.x ),
+            SimdVec4f( rInvDir.y ), SimdVec4f( rOrigin.y ),
+            SimdVec4f( rInvDir.z ), SimdVec4f( rOrigin.z )
+        };
 
         size_t nStackSize = pBVH->GetStackDepth()*(MBVH_T::BRANCH_FACTOR);
         ScratchArray<ConstNodeHandle> pStackMem( rScratch, nStackSize );
@@ -62,7 +73,7 @@ namespace TinyRT
             }
             else
             {
-                pStack = pBVH->RayIntersectChildren( pNode, rRay, pStack, nDirSigns );
+                pStack = pBVH->RayIntersectChildren( pNode, vSIMDRay, rRay, pStack, nDirSigns );
             }
         }
     }

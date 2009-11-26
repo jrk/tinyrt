@@ -96,7 +96,7 @@ namespace TinyRT
    
         /// Performs a ray intersection test against the children of a node, pushing any hit nodes onto the given stack
         template< class Ray_T >
-        TRT_FORCEINLINE NodeHandle* RayIntersectChildren( NodeHandle nNode, const Ray_T& rRay, NodeHandle* pStack, const int nDirSigns[4] ) const;
+        TRT_FORCEINLINE NodeHandle* RayIntersectChildren( NodeHandle nNode, const SimdVec4f vSIMDRay[6], const Ray_T& rRay, NodeHandle* pStack, const int nDirSigns[4] ) const;
 
 
         /// Returns the memory consumption of the data structure, as well as the amount allocated
@@ -183,8 +183,17 @@ namespace TinyRT
         /// Allocates leaf information
         inline NodeHandle BuyLeaf()
         {
-            m_leafInfo.push_back( LeafObjects() );
-            uint32 n = static_cast<uint32>( m_leafInfo.size()-1 );
+            if( m_nLeafsInUse == m_nLeafArraySize )
+            {
+                LeafObjects* pNewLeafs = new LeafObjects[m_nLeafArraySize*2];
+                memcpy( pNewLeafs, m_pLeafObjects, sizeof(LeafObjects)*m_nLeafsInUse );
+                delete[] m_pLeafObjects;
+                m_pLeafObjects = pNewLeafs;
+                m_nLeafArraySize*=2;
+            }
+
+            m_nLeafsInUse++;
+            uint32 n = m_nLeafsInUse-1;
             return ( n | 0x80000000 );
         };
 
@@ -199,15 +208,17 @@ namespace TinyRT
         inline LeafObjects* LookupLeaf( NodeHandle nNode ) 
         {
             TRT_ASSERT( IsNodeLeaf( nNode ) );
-            return &m_leafInfo[nNode & 0x7fffffff ];
+            return &m_pLeafObjects[nNode & 0x7fffffff ];
         }
         inline const LeafObjects* LookupLeaf( NodeHandle nNode ) const 
         {
             TRT_ASSERT( IsNodeLeaf( nNode ) );
-            return &m_leafInfo[nNode & 0x7fffffff ];
+            return &m_pLeafObjects[nNode & 0x7fffffff ];
         }
 
-        std::vector<LeafObjects> m_leafInfo;
+        LeafObjects* m_pLeafObjects;
+        uint32 m_nLeafArraySize;
+        uint32 m_nLeafsInUse;
 
         Node* m_pNodes;
         uint32 m_nNodeArraySize;
