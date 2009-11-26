@@ -234,6 +234,70 @@ namespace TinyRT
         if( a[2] > b[2] ) std::swap( a[2], b[2] );
     }
 
+
+    // ---------------------------------------------------------------------------------------------------
+    //   Reflection/refraction
+    // ---------------------------------------------------------------------------------------------------
+
+    //=====================================================================================================================
+    /// \ingroup TinyRT
+    /// Computes the reflection vector
+    /// \param N   Surface normal
+    /// \param I   Incident vector for which reflection direction is computed
+    /// \return Reflection of -I about N
+    //=====================================================================================================================
+    template< class Vec3_T >
+    inline Vec3_T Reflect( const Vec3_T& N, const Vec3_T& I )
+    {
+        return I - N * (2*Dot3(N,I));
+    }
+
+    //=====================================================================================================================
+    /// \ingroup TinyRT
+    /// Computes the reflection vector
+    /// \param N   Surface normal
+    /// \param I   Incident vector for which reflection direction is computed
+    /// \param R   Receives the reflected vector
+    //=====================================================================================================================
+    template< class Vec3_T >
+    inline void Reflect( const Vec3_T& N, const Vec3_T& I, Vec3_T& R )
+    {
+        float f = 2.0f*Dot3(N,I);
+        R[0] = I[0] - N[0]*f ;
+        R[1] = I[1] - N[1]*f ;
+        R[2] = I[2] - N[2]*f ;
+    }
+
+    //=====================================================================================================================
+    /// \param I    Incident vector to refract
+    /// \param N    Surface normal, assumed to point in the opposite direction as I
+    /// \param eta  Relative index of refraction at the boundary (outside IOR / inside IOR)
+    /// \param R    Receives the refracted direction (unnormalized)
+    /// \return True if refraction occurs, false if total internal reflection occurs.  
+    ///              R is not modified in the event of total internal reflection
+    //=====================================================================================================================
+    template< class Vec3_T >
+    inline bool Refract( const Vec3_T& I, const Vec3_T& N, float eta, Vec3_T& R )
+    {
+        float vdotn = Dot3(I,N);
+
+        float B = (eta*eta)*(1.0f - vdotn*vdotn);
+        if( B > 1.0 )
+        {
+            // total internal reflection
+            return false;
+        }
+        else
+        {
+            float f = (-vdotn*eta - sqrtf(1.0f-B));
+            R[0] = N[0]*f + I[0]*eta;
+            R[1] = N[1]*f + I[1]*eta;
+            R[2] = N[2]*f + I[2]*eta;
+            return true;
+        }
+    }
+
+
 }
 
 #endif // _TRT_MATH_H_
